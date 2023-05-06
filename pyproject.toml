@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "brave-search"
+version = "0.1.0"
+description = "brave search from the cli"
+authors = ["patrick-joosey"]
+readme = "README.md"
+packages = [{include = "brave_search"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.30.0"
+rich = "^13.3.5"
+bs4 = "^0.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+brave = 'brave_search.brave:main'
