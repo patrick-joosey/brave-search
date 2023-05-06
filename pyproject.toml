@@ -11,6 +11,7 @@ python = "^3.11"
 requests = "^2.30.0"
 rich = "^13.3.5"
 bs4 = "^0.0.1"
+typer = "^0.9.0"
 
 
 [build-system]
@@ -18,4 +19,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-brave = 'brave_search.brave:main'
+brave = 'brave_search.brave:app'

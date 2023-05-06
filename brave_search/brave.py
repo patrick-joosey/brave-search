@@ -1,13 +1,15 @@
 import sys
 from dataclasses import dataclass
-from typing import TypeVar
+from typing import TypeVar, List
 
 import requests
+import typer
 from bs4 import BeautifulSoup
-from rich import print
 from rich.console import Console
 from rich.panel import Panel
+from typing_extensions import Annotated
 
+app = typer.Typer(add_completion=False)
 P = TypeVar("P", bound=Panel)
 
 
@@ -20,22 +22,45 @@ class Result(object):
     time: str
 
 
-def main():
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <query>")
+def display_results(results: List[Result], csv: bool):
+    """
+    Display results to terminal or csv style output
+    """
+
+    if csv:
+        print("link,title,description")
+        for r in results:
+            print(",".join([r.href, r.title, r.desc]))
         sys.exit(1)
 
-    query = sys.argv[1]
+    console = Console()
 
-    params = {
-        'q': query
-    }
-    res = requests.get("https://search.brave.com/search", params=params)
+    for i, r in enumerate(results):
+        console.print(f"{i+1} [blue]{r.title}")
+        console.print(f"[gray]{r.href}")
+        console.print(f"{r.desc}")
+        if r.time:
+            console.print(f"[light gray]{r.time}")
+        console.rule()
+
+
+@app.command(no_args_is_help=True)
+def main(
+        query: Annotated[str, typer.Argument(..., help="search query")],
+        limit: int = typer.Option(10, help="number of search results"),
+        csv: bool = typer.Option(False, help="output results as csv")
+):
+    """
+    Search brave.com from the CLI
+    """
+
+    res = requests.get("https://search.brave.com/search", params={'q': query})
 
     soup = BeautifulSoup(res.text, 'html.parser')
 
     results = []
-    for i, item in enumerate(soup.find_all("div", "snippet fdb")[:10]):
+
+    for i, item in enumerate(soup.find_all("div", "snippet fdb")[:limit]):
         full_desc = item.p.text.strip()
 
         if "-" in full_desc:
@@ -52,16 +77,8 @@ def main():
                    time.strip())
         )
 
-    console = Console()
-
-    for r in results:
-        console.print(f"[blue]{r.title}")
-        console.print(f"[gray]{r.href}")
-        console.print(f"{r.desc}")
-        if r.time:
-            console.print(f"[light gray]{r.time}")
-        console.rule()
+    display_results(results, csv)
 
 
 if __name__ == '__main__':
-    main()
+    app()
