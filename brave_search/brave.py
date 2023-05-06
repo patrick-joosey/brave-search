@@ -31,17 +31,17 @@ def display_results(results: List[Result], csv: bool):
         print("link,title,description")
         for r in results:
             print(",".join([r.href, r.title, r.desc]))
-        sys.exit(1)
 
-    console = Console()
+    else:
+        console = Console()
 
-    for i, r in enumerate(results):
-        console.print(f"{i+1} [blue]{r.title}")
-        console.print(f"[gray]{r.href}")
-        console.print(f"{r.desc}")
-        if r.time:
-            console.print(f"[light gray]{r.time}")
-        console.rule()
+        for i, r in enumerate(results):
+            console.print(f"{i + 1} [light blue]{r.title}")
+            console.print(f"[gray]{r.href}")
+            console.print(f"{r.desc}")
+            if r.time:
+                console.print(f"[light gray]{r.time}")
+            console.rule()
 
 
 @app.command(no_args_is_help=True)
