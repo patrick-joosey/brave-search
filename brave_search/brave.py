@@ -9,6 +9,7 @@ from rich.panel import Panel
 from typing_extensions import Annotated
 
 app = typer.Typer(add_completion=False)
+
 P = TypeVar("P", bound=Panel)
 
 
@@ -90,8 +91,7 @@ def main(
     Search brave.com from the CLI
     """
 
-    results = do_search(query, limit)
-    display_results(results, csv)
+    display_results(do_search(query, limit), csv)
 
 
 if __name__ == '__main__':
