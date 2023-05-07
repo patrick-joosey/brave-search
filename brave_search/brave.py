@@ -1,4 +1,3 @@
-import sys
 from dataclasses import dataclass
 from typing import TypeVar, List
 
@@ -22,9 +21,11 @@ class Result(object):
     time: str
 
 
-def display_results(results: List[Result], csv: bool):
+def display_results(results: List[Result], csv: bool) -> None:
     """
     Display results to terminal or csv style output
+    :param results: List of Result objects from do_search
+    :param csv: boolean for csv style output
     """
 
     if csv:
@@ -44,14 +45,13 @@ def display_results(results: List[Result], csv: bool):
             console.rule()
 
 
-@app.command(no_args_is_help=True)
-def main(
-        query: Annotated[str, typer.Argument(..., help="search query")],
-        limit: int = typer.Option(10, help="number of search results"),
-        csv: bool = typer.Option(False, help="output results as csv")
-):
+def do_search(query: str, limit: int = 10) -> List[Result]:
     """
-    Search brave.com from the CLI
+    Perform request to search.brave.com and return a list of Results
+
+    :param query: search string
+    :param limit: limit search results to int
+    :return:
     """
 
     res = requests.get("https://search.brave.com/search", params={'q': query})
@@ -77,6 +77,20 @@ def main(
                    time.strip())
         )
 
+    return results
+
+
+@app.command(no_args_is_help=True)
+def main(
+        query: Annotated[str, typer.Argument(..., help="search query")],
+        limit: int = typer.Option(10, help="number of search results"),
+        csv: bool = typer.Option(False, help="output results as csv")
+):
+    """
+    Search brave.com from the CLI
+    """
+
+    results = do_search(query, limit)
     display_results(results, csv)
 
 
